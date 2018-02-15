@@ -16,3 +16,5 @@ If the DRIVER_LIB is undefined, the only files needed to get blinking on CC1310 
 The default Cortex M3 integration for FreeRTOS does not work because CC1310 has built in functionality in ROM, after it starts, the NVIC is pointing to a location in ROM, meaning even if we add our Interrupt Handlers for SVC and SysTick they will not execute. We have to move the NVIC Vector table to the correct address at the begining of FLASH or in RAM if required. (Check the startup_cc13xx_gcc.c file for NVIC_VTABLE)
 
 This project is distributed under "FreeRTOS Open Source License". Full license text is available on the following link: http://www.freertos.org/a00114.html
+
+The FreeRTOS version used is 10.0.1
