@@ -7,7 +7,8 @@
     #include <CC1310/driverlib/ioc.h>
     #include <CC1310/driverlib/gpio.h>
 
-    #define LED IOID_7
+    #define LED_GREEN IOID_7
+    #define LED_RED   IOID_6
 #else
     #include <CC1310/inc/hw_types.h>
     #include <CC1310/inc/hw_memmap.h>
@@ -15,7 +16,8 @@
     #include <CC1310/inc/hw_gpio.h>
     #include <CC1310/inc/hw_ioc.h>
 
-    #define LED 0x00000007
+    #define LED_GREEN   0x00000007
+    #define LED_RED     0x00000006
 #endif
 
 #define WAIT_TRUE(x) do{;}while(!(x));
@@ -40,7 +42,10 @@ void letToggle(void* params){
     PRCMLoadSet();
     WAIT_TRUE(PRCMLoadGet());
 
-    IOCPinTypeGpioOutput(LED);
+    IOCPinTypeGpioOutput(LED_GREEN);
+    IOCPinTypeGpioOutput(LED_RED);
+    GPIO_writeDio(LED_GREEN, 0);
+    GPIO_writeDio(LED_RED, 1);
 #else
     // Power on the PERIPHERAL Domain
     HWREG(PRCM_BASE + PRCM_O_PDCTL0PERIPH) = 1;
@@ -48,25 +53,29 @@ void letToggle(void* params){
 
     // Enable the GPIO Peripheral
     HWREG(PRCM_BASE + PRCM_O_GPIOCLKGR) |= 1;
-
-    // Execute the power on and enable
+    // Enable the update of all load related registers, and wait for the to finish loading
     HWREG(PRCM_NONBUF_BASE + PRCM_O_CLKLOADCTL) = PRCM_CLKLOADCTL_LOAD;
-    // Enable the update of all load related registers.
     WAIT_TRUE((HWREG(PRCM_BASE + PRCM_O_CLKLOADCTL) & PRCM_CLKLOADCTL_LOAD_DONE));
 
     // Set the LED pin to be an output pin
     // Setup pin and port -> This is the multiplexer and port configuration
-    HWREG(IOC_BASE + ( LED << 2 )) = IOC_IOCFG0_PORT_ID_GPIO | IOC_IOCFG0_PULL_CTL_DIS | IOC_IOCFG1_IOMODE_NORMAL; // GPIO port, default values - No Pull
+    HWREG(IOC_BASE + ( LED_GREEN << 2 )) = IOC_IOCFG0_PORT_ID_GPIO | IOC_IOCFG0_PULL_CTL_DIS | IOC_IOCFG1_IOMODE_NORMAL; // GPIO port, default values - No Pull
     // Enable output mode in the GPIO module.
-    HWREGBITW( GPIO_BASE + GPIO_O_DOE31_0, LED ) = 1;
+    HWREGBITW( GPIO_BASE + GPIO_O_DOE31_0, LED_GREEN ) = 1;
+    HWREGBITW( GPIO_BASE + GPIO_O_DOE31_0, LED_RED ) = 1;
+
+    HWREGB( GPIO_BASE + LED_GREEN ) = 0;
+    HWREGB( GPIO_BASE + LED_RED ) = 1;
+
 #endif
 
     // Blink
     while(1){
 #ifdef DRIVER_LIB
-        GPIO_toggleDio(LED);
+        GPIO_toggleDio(LED_GREEN);
+        GPIO_toggleDio(LED_RED);
 #else
-        HWREG( GPIO_BASE + GPIO_O_DOUTTGL31_0 ) = ( 1 << LED );
+        HWREG( GPIO_BASE + GPIO_O_DOUTTGL31_0 ) = ( 1 << LED_GREEN ) | (1 << LED_RED );
 #endif
         vTaskDelay(1000);
     }

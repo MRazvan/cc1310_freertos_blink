@@ -212,11 +212,6 @@ ResetISR(void)
     uint32_t *pDest;
 
     //
-    // Final trim of device
-    //
-    //SetupTrimDevice();
-
-    //
     // Copy the data segment initializers from FLASH to SRAM.
     //
     pSrc = &_ldata;
