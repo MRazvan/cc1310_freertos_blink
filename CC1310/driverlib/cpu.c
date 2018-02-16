@@ -385,8 +385,8 @@ void __attribute__((naked))
 CPUdelay(uint32_t ui32Count)
 {
     // Loop the specified number of times
-    __asm volatile ("    subs    %0, #1\n"
-                    "    bne     NOROM_CPUdelay\n"
+    __asm volatile ("%=: subs    %0, #1\n"
+                    "    bne     %=b\n"
                     "    bx      lr\n"
                     : /* No output */
                     : "r" (ui32Count)
