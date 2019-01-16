@@ -1,4 +1,7 @@
 # CC1310 FreeRTOS Blink
+
+*For a basic RF functionality integrated in FreeRTOS  https://github.com/MRazvan/cc1310_freertos_radio*
+
 Basic project demonstrating the usage of FreeRTOS on the Simplelink CC1310 mcu without TI SDK's. It uses the GCC compiler to build.
 There is no need to install any TI SDK's, except what is needed to run CCS and debug with XDS110. 
 As a note it also includes only what is needed, CC1310 driverlib must be aquired (usually from TI SDK's) for more functionality.
